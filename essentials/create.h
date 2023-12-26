@@ -1,0 +1,1 @@
+void create_directories(const char *path);

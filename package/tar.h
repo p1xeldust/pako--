@@ -1,0 +1,1 @@
+int extract_tar(const char *source, const char *destination);
