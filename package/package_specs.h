@@ -34,6 +34,7 @@ struct pkg_data
     char version[16];
     char deps[512];
     char confs[512];
+    char desc[64];
     struct pkg_arch_data arch;
     enum pkg_meta_type meta;
     struct pkg_data_files files;

@@ -7,7 +7,7 @@
 #include "../package/parse.h"
 #include "../output/o.h"
 
-int is_in_database(struct pkg_data *pd)
+int is_in_database(const char* pkg_name)
 {
     char db_path[strlen(VAR_PATH) + strlen("/packages.db") + 1];
     sprintf(db_path, "%s/packages.db", VAR_PATH);
@@ -27,7 +27,7 @@ int is_in_database(struct pkg_data *pd)
         exit(1);
     }
 
-    sqlite3_bind_text(stmt, 1, pd->name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, pkg_name, -1, SQLITE_STATIC);
 
     int result = sqlite3_step(stmt);
     if (result == SQLITE_ROW)
@@ -58,12 +58,12 @@ int get_package_data_from_db(const char* pkg_name, struct pkg_data *pd) {
     sqlite3 *db;
     sqlite3_stmt *stmt;
     if (sqlite3_open(db_path, &db) != SQLITE_OK) {
-        fprintf(stderr, "Error opening database. SQLite error: %s\n", sqlite3_errmsg(db));
+        pk_error(0, "Error opening database. SQLite error: %s\n", sqlite3_errmsg(db));
         exit(1);
     }
 
     if (sqlite3_prepare_v2(db, "SELECT * FROM packages WHERE name = ?;", -1, &stmt, 0) != SQLITE_OK) {
-        fprintf(stderr, "Error selecting package from db. SQLite error: %s\n", sqlite3_errmsg(db));
+        pk_error(0, "Error selecting package from db. SQLite error: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
         sqlite3_close(db);
         exit(1);
@@ -72,11 +72,15 @@ int get_package_data_from_db(const char* pkg_name, struct pkg_data *pd) {
     sqlite3_bind_text(stmt, 1, pkg_name, -1, SQLITE_STATIC);
     
     int step_result = sqlite3_step(stmt);
-    if (step_result == SQLITE_ROW) {
-        printf("step");
+    if (sqlite3_step(stmt) == SQLITE_ROW == SQLITE_ROW) {
         strcpy(pd->name, (char *)sqlite3_column_text(stmt, 0));
         strcpy(pd->files.info_file_path, (char *)sqlite3_column_text(stmt, 1));
         strcpy(pd->files.list_file_path, (char *)sqlite3_column_text(stmt, 2));
+    } else if(step_result != SQLITE_DONE) {
+        pk_error(0, "Error selecting package from db. SQLite error: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        exit(1);
     }
 
     sqlite3_finalize(stmt);

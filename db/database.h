@@ -5,7 +5,7 @@
 
 void init_database();
 void add_package_to_database(struct pkg_data *pd, const char *listPath, const char *infoPath);
-int is_in_database(struct pkg_data *pd);
+int is_in_database(const char* pkg_name);
 void get_package_data_from_db(const char* pkg_name, struct pkg_data *pd);
 
 #endif

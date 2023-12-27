@@ -35,6 +35,8 @@ int parse_specs(struct pkg_data *pd) {
                 strcpy(pd->deps, value);
             } else if (strstr(token, "conflicts")) {
                 strcpy(pd->confs, value);
+            } else if (strstr(token, "description")) {
+                strcpy(pd->desc, value);
             }
         }
     }
