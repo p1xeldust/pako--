@@ -1,3 +1,7 @@
+/**
+ * Written by Paul Goldstein, December 2023.
+ */
+
 #include <stddef.h>
 #include <stdio.h>
 

@@ -4,8 +4,6 @@
 #include "tar.h"
 #include "../essentials/create.h"
 
-
-
 char tmp_path[PATH_MAX];
 char *unpack_package(const char *filename)
 {

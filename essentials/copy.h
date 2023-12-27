@@ -4,6 +4,6 @@
 void copy_file(const char *source, const char *destination);
 
 // АХТУНГ!! Рекурсивная функция
-bool copy_directory(const char *source, const char *destination);
+void copy_directory(const char *source, const char *destination);
 
 #endif

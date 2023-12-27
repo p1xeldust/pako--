@@ -1,3 +1,7 @@
+/**
+ * Written by Paul Goldstein, December 2023.
+ */
+
 #include "../compat/sys/utsname.h"
 #include <string.h>
 #include <stdio.h>
