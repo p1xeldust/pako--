@@ -1,11 +1,12 @@
+#include "../compat/linux/limits.h"
 #include <stdio.h>
 
 #include "tar.h"
 #include "../essentials/create.h"
 
-#define MAX_PATH 1024
 
-char tmp_path[MAX_PATH];
+
+char tmp_path[PATH_MAX];
 char *unpack_package(const char *filename)
 {
     snprintf(tmp_path, sizeof(tmp_path), "%s/%s_tmp", TMP_PATH, filename);
