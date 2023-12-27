@@ -1,3 +1,7 @@
+/**
+ * Written by Paul Goldstein, December 2023.
+ */
+
 #include "../compat/linux/limits.h"
 #include <sqlite3.h>
 #include <string.h>
