@@ -9,9 +9,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <archive.h>
-#include <archive_entry.h>
-
 int extract_tar(const char *source, const char *destination) {
     struct archive *a;
     struct archive_entry *entry;

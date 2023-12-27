@@ -3,7 +3,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <string.h>
-#include <linux/limits.h>
+#include "../compat/linux/limits.h"
 
 #include "../essentials/copy.h"
 

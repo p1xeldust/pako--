@@ -1,4 +1,4 @@
-#include <linux/limits.h>
+#include "../compat/linux/limits.h"
 #include <dirent.h>
 #include <stddef.h>
 
