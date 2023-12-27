@@ -1,26 +1,23 @@
-#ifdef __linux
 #include <linux/limits.h>
-#else
-#include <limits.h>
-#endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+#include "../output/o.h"
 
 void copy_file(const char *source, const char *destination)
 {
     FILE *source_file = fopen(source, "rb"), *dest_file = fopen(destination, "wb");
     if (!source_file || !dest_file)
     {
-        perror("copy.c: Cannot copy file");
+        pk_warn("copy.c:copy_file Cannot copy file %s, skipping", strrchr(source, '/'));
         fclose(source_file);
-        exit(1);
+        return;
     }
 
     char buffer[1024];
@@ -30,7 +27,7 @@ void copy_file(const char *source, const char *destination)
     {
         if (fwrite(buffer, 1, bytes_read, dest_file) != bytes_read)
         {
-            perror("copy.c: Error writing to destination file");
+            pk_error("copy.c:copy_file Error writing to destination file");
             fclose(source_file);
             fclose(dest_file);
             exit(1);
@@ -41,24 +38,24 @@ void copy_file(const char *source, const char *destination)
     fclose(dest_file);
 
     struct stat stat_buf;
-    if (stat(source, &stat_buf) != 0)
+    if (stat(source, &stat_buf))
     {
-        perror("copy.c: Error getting source file permissions");
+        pk_error(0, "copy.c:copy_file Error getting source file permissions");
         exit(1);
     }
 
-    if (chmod(destination, stat_buf.st_mode) != 0)
+    if (chmod(destination, stat_buf.st_mode))
     {
-        perror("copy.c: Error setting destination file permissions");
+        pk_error(0, "copy.c:copy_file Error setting destination file permissions");
         exit(1);
     }
 
-    return 1;
+    return;
 }
 
 // АХТУНГ, ВАРНИНГ! Функция рекурсивна
 
-bool copy_directory(const char *source, const char *destination)
+int copy_directory(const char *source, const char *destination)
 {
     DIR *dir = opendir(source);
     if (!dir)

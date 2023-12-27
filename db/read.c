@@ -1,15 +1,13 @@
-#include <linux/limits.h>
+#include "../compat/linux/limits.h"
 #include <sqlite3.h>
-#include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 
-#include "../package/package_specs.h"
+#include "../package/parse.h"
 #include "../output/o.h"
 
-bool is_in_database(struct pkg_data *pd)
+int is_in_database(struct pkg_data *pd)
 {
     char db_path[strlen(VAR_PATH) + strlen("/packages.db") + 1];
     sprintf(db_path, "%s/packages.db", VAR_PATH);
@@ -50,40 +48,39 @@ bool is_in_database(struct pkg_data *pd)
     return 0;
 }
 
-/* some old code we won't need anymore
+int get_package_data_from_db(const char* pkg_name, struct pkg_data *pd) {
+    char db_path[strlen(VAR_PATH) + strlen("/packages.db") + 1];
+    sprintf(db_path, "%s/packages.db", VAR_PATH);
 
-    void get_database_package_data(struct pkg_data *pd)
-    {
-        char db_path[strlen(VAR_PATH) + strlen("/packages.db") + 1];
-        sprintf(db_path, "%s/packages.db", VAR_PATH);
+    pd->name[0] = '\0';
+    pd->files.info_file_path[0] = '\0';
+    pd->files.list_file_path[0] = '\0';
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    if (sqlite3_open(db_path, &db) != SQLITE_OK) {
+        fprintf(stderr, "Error opening database. SQLite error: %s\n", sqlite3_errmsg(db));
+        exit(1);
+    }
 
-        sqlite3 *db;
-        sqlite3_stmt *stmt;
-        if (sqlite3_open(db_path, &db))
-        {
-            perror("read.c:is_in_database: Error opening database");
-            exit(1);
-        }
-
-        sqlite3_prepare_v2(db, "SELECT * FROM packages WHERE name = ?;", -1, &stmt, 0);
-        sqlite3_bind_text(stmt, 1, pd->name, -1, SQLITE_STATIC);
-
-        if (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            strcpy(pd->name, (char *)sqlite3_column_text(stmt, 0));
-            strcpy(pd->version, (char *)sqlite3_column_text(stmt, 0));
-            strcpy(pd->arch.name, (char *)sqlite3_column_text(stmt, 0));
-            strcpy(pd->name, (char *)sqlite3_column_text(stmt, 0));
-            strcpy(pd->name, (char *)sqlite3_column_text(stmt, 0));
-        }
-        else
-        {
-            perror("read.c:is_in_database: Error ret");
-            exit(1);
-        }
-
+    if (sqlite3_prepare_v2(db, "SELECT * FROM packages WHERE name = ?;", -1, &stmt, 0) != SQLITE_OK) {
+        fprintf(stderr, "Error selecting package from db. SQLite error: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
         sqlite3_close(db);
-        return;
+        exit(1);
     }
-*/
+
+    sqlite3_bind_text(stmt, 1, pkg_name, -1, SQLITE_STATIC);
+    
+    int step_result = sqlite3_step(stmt);
+    if (step_result == SQLITE_ROW) {
+        printf("step");
+        strcpy(pd->name, (char *)sqlite3_column_text(stmt, 0));
+        strcpy(pd->files.info_file_path, (char *)sqlite3_column_text(stmt, 1));
+        strcpy(pd->files.list_file_path, (char *)sqlite3_column_text(stmt, 2));
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return parse_specs(pd);
+}

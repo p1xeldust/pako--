@@ -1,3 +1,6 @@
+#ifndef SPECS_H
+#define SPECS_H
+
 #include "../compat/linux/limits.h"
 
 enum arch_meta
@@ -35,3 +38,5 @@ struct pkg_data
     enum pkg_meta_type meta;
     struct pkg_data_files files;
 };
+
+#endif

@@ -1,6 +1,6 @@
 #include <sqlite3.h>
 #include <string.h>
-#include <stdbool.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #include "../package/package_specs.h"
@@ -21,13 +21,6 @@ void init_database() {
         sqlite3_close(db);
         exit(1);
     }
-    /* Little preparation for new alternatives update
-    if(sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS alternatives (package TEXT, alternative TEXT);", 0, 0, 0)) {
-        perror("Unable to initialize database alternatives table.");
-        sqlite3_close(db);
-        exit(1);
-    }
-    */
     sqlite3_close(db);
     return;
 }

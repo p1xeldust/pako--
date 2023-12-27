@@ -5,6 +5,8 @@
 #include <string.h>
 #include <linux/limits.h>
 
+#include "../essentials/copy.h"
+
 #define MAX_PATH_LENGTH PATH_MAX
 #define MAX_FILENAME_LENGTH NAME_MAX
 
@@ -49,25 +51,7 @@ void copy_files_by_list(const char *tmp_source_dir_path, FILE *list, const char 
                 {
                     char destination_file_path[MAX_PATH_LENGTH];
                     sprintf(destination_file_path, "%s/%s", prefix, entry->d_name);
-
-                    FILE *source_file = fopen(source_path, "rb");
-                    FILE *dest_file = fopen(destination_file_path, "wb");
-
-                    if (source_file && dest_file)
-                    {
-                        int ch;
-                        while ((ch = fgetc(source_file)) != EOF)
-                        {
-                            fputc(ch, dest_file);
-                        }
-                        fclose(source_file);
-                        fclose(dest_file);
-                    }
-                    else
-                    {
-                        pk_error(1, "copy_files_by_list.c: Cannot copy files");
-                        exit(1);
-                    }
+                    copy_file(source_path, destination_file_path);
                 }
             }
         }

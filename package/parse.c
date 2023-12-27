@@ -10,40 +10,34 @@
 #define SPECS_LINE_LENGTH 80
 #define CONS_DEPS_LINE_LENGTH 528
 
-int parse_specs(FILE *specs_file, struct pkg_data *pd) {
-
-    memset(pd, 0, sizeof(struct pkg_data));
+int parse_specs(struct pkg_data *pd) {
+    FILE* specs_file = fopen(pd->files.info_file_path, "r");
 
     if (!specs_file) {
-        perror("Ошибка открытия файла");
-        return 1;
+        pk_error(1, "parse.c:parse_specs Error opening '%s'", pd->files.info_file_path);
+        exit(1);
     }
 
     char line[256];
     while (fgets(line, sizeof(line), specs_file)) {
-        char *token = strtok(line, ":");
+        char *token = strtok(line, " ");
         if (token) {
+            char* value = strtok(NULL, "\n");
             if (strstr(token, "name")) {
-                strtok(NULL, " ");
-                strcpy(pd->name, strtok(NULL, " \n"));
+                strcpy(pd->name, value);
             } else if (strstr(token, "arch")) {
-                strtok(NULL, " ");
-                strcpy(pd->arch.name, strtok(NULL, " \n"));
+                strcpy(pd->arch.name, value);
             } else if (strstr(token, "version")) {
-                strtok(NULL, " ");
-                strcpy(pd->version, strtok(NULL, " \n"));
+                strcpy(pd->version, value);
             } else if (strstr(token, "type")) {
-                strtok(NULL, " ");
-                pd->meta = atoi(strtok(NULL, " \n"));
+                pd->meta = atoi(value);
             } else if (strstr(token, "dependencies")) {
-                strtok(NULL, " ");
-                strcpy(pd->deps, strtok(NULL, " \n"));
+                strcpy(pd->deps, value);
             } else if (strstr(token, "conflicts")) {
-                strtok(NULL, " ");
-                strcpy(pd->confs, strtok(NULL, " \n"));
+                strcpy(pd->confs, value);
             }
         }
     }
-    rewind(specs_file);
+    fclose(specs_file);
     return 0;
 }

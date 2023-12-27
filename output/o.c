@@ -38,9 +38,9 @@ void pk_error(int errno_enable, const char *message_format, ...)
     va_start(args, message_format);
     fprintf(stderr, "\033[1;31mError\033[0;1m: ");
     vfprintf(stderr, message_format, args);
-    if (!errno_en)
+    if (!errno_enable)
         fprintf(stderr, "\033[1;0m");
     else
-        fprintf(stderr, ": %s\033[1;0m", strerror(errno));
+        fprintf(stderr, ": %s\033[1;0m\n", strerror(errno));
     va_end(args);
 }
