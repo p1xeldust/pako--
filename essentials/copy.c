@@ -31,7 +31,7 @@ void copy_file(const char *source, const char *destination)
     {
         if (fwrite(buffer, 1, bytes_read, dest_file) != bytes_read)
         {
-            pk_error("copy.c:copy_file Error writing to destination file");
+            pk_error(1, "copy.c:copy_file Error writing to destination file");
             fclose(source_file);
             fclose(dest_file);
             exit(1);
@@ -44,13 +44,13 @@ void copy_file(const char *source, const char *destination)
     struct stat stat_buf;
     if (stat(source, &stat_buf))
     {
-        pk_error(0, "copy.c:copy_file Error getting source file permissions");
+        pk_error(1, "copy.c:copy_file Error getting source file permissions");
         exit(1);
     }
 
     if (chmod(destination, stat_buf.st_mode))
     {
-        pk_error(0, "copy.c:copy_file Error setting destination file permissions");
+        pk_error(1, "copy.c:copy_file Error setting destination file permissions");
         exit(1);
     }
 
