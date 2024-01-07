@@ -7,18 +7,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "specs_check.h"
 #include "../output/o.h"
+#include "package_specs.h"
+#include "specs_check.h"
 #include "arch.h"
 
 #define SPECS_LINE_LENGTH 80
 #define CONS_DEPS_LINE_LENGTH 528
 
-int parse_specs(struct pkg_data *pd) {
-    FILE* specs_file = fopen(pd->files.info_file_path, "r");
+int parse_specs(char* specs_file_path, struct pkg_data *pd) {
+    FILE* specs_file = fopen(specs_file_path, "r");
 
     if (!specs_file) {
-        pk_error(1, "parse.c:parse_specs Error opening '%s'", pd->files.info_file_path);
+        pk_error(1, "parse.c:parse_specs Error opening '%s'", specs_file_path);
         exit(1);
     }
 
@@ -40,10 +41,10 @@ int parse_specs(struct pkg_data *pd) {
             } else if (strstr(token, "conflicts")) {
                 strcpy(pd->confs, value);
             } else if (strstr(token, "description")) {
-                strcpy(pd->desc, value);
+                strcpy(pd->description, value);
             }
         }
     }
     fclose(specs_file);
-    return 0;
+    return check_specs(pd);
 }

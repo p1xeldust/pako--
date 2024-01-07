@@ -14,7 +14,7 @@
 #define MAX_PATH_LENGTH PATH_MAX
 #define MAX_FILENAME_LENGTH NAME_MAX
 
-void copy_files_by_list(const char *tmp_source_dir_path, FILE *list, const char *prefix)
+void copy_files_by_list(const char* tmp_source_dir_path, FILE* list, const char* prefix)
 {
     if (list == NULL)
     {
@@ -25,14 +25,16 @@ void copy_files_by_list(const char *tmp_source_dir_path, FILE *list, const char 
     char file_name[MAX_FILENAME_LENGTH];
     while (fgets(file_name, sizeof(file_name), list) != NULL)
     {
-        DIR *dir = opendir(tmp_source_dir_path);
+        if (!strcmp(file_name, "/"))
+            continue;
+        DIR* dir = opendir(tmp_source_dir_path);
         if (dir == NULL)
         {
             perror("copy_files_by_list.c: Cannot open package source directory");
             exit(1);
         }
 
-        struct dirent *entry;
+        struct dirent* entry;
         struct stat stat_buf;
         while ((entry = readdir(dir)) != NULL)
         {
@@ -42,7 +44,7 @@ void copy_files_by_list(const char *tmp_source_dir_path, FILE *list, const char 
                 continue;
             if (S_ISDIR(stat_buf.st_mode))
             {
-                if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+                if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
                     continue;
                 char dest_dir[MAX_PATH_LENGTH];
                 sprintf(dest_dir, "%s/%s", prefix, entry->d_name);

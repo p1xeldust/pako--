@@ -1,0 +1,7 @@
+name flag
+version 0.1
+arch ham64
+type 0
+dependencies dep1 dep2
+conflicts conf1 conf2
+description "Flag!"
